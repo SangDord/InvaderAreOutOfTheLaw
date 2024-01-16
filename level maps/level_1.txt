@@ -1,0 +1,15 @@
+WWWWWWWWWWWW
+W......V...W
+W.B........W
+W....U.....W
+W.......B..W
+W..H.......W
+W..B....P..W
+WWWWWWWWWWWW
+
+#V - Vertical_monster
+#H - Horizontal_monster
+#P - Permanent_monster
+#U - User
+#B - Box
+#W - Wall
