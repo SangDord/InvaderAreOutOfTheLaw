@@ -1,10 +1,10 @@
 WWWWWWWWWWWW
-W..WWWWWW..W
-W.U.WWWW.B.W
-W..........W
-W..B.......W
-WW.....P...W
-WWWWWWWWWP.W
+WWWWBW.V...W
+WW.H.WV..B.W
+W..BBB..UBBW
+W..BB.B....W
+WH....WBBWWW
+WB.BB.WWWWWW
 WWWWWWWWWWWW
 
 #V - Vertical_monster
