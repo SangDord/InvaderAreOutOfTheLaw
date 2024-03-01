@@ -99,6 +99,8 @@ class User(Sprite):
             if box := pygame.sprite.spritecollideany(self, box_grp):
                 if not box.pushable(key):
                     self.rect = self.rect.move(0, self.cell_size)
+        elif key == pygame.K_r:
+            self.remove(player_grp)
         if pygame.sprite.spritecollideany(self, enemy_grp):
             self.remove(player_grp)
         self.image = get_sprite(self.obj_id, self.direction, et)

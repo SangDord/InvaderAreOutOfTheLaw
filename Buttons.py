@@ -16,10 +16,12 @@ class Button:
             self.hover_image = pygame.transform.scale(self.hover_image, (width, height))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.sound = None
+        # Проверяем наличие звука
         if sound_path:
             self.sound = pygame.mixer.Sound('assets/' + sound_path)
         self.is_hovered = False
 
+    # Делаем текст
     def draw(self, screen):
         current_image = self.hover_image if self.is_hovered else self.image
         screen.blit(current_image, self.rect.topleft)

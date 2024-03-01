@@ -151,14 +151,17 @@ def info_menu():
 def new_game():
     pygame.display.set_caption("Game")
     # Создание кнопок
-    back_welcome = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Продолжить",
-                          "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
-
+    welcome_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Продолжить",
+                            "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
+    back_button = Button(WIDTH / 2 - (252 / 2), 450, 252, 74, "Назад", "image_button.jpg",
+                         "image_button_hover.jpg", 'song.mp3')
     running = True
     while running:
         screen.fill((0, 0, 0))
 
-        text("Добро пожаловать в игру!", 72, (255, 255, 255), (WIDTH / 2, 100))
+        text("Добро пожаловать в игру\n"
+             "Invader Are Out Of The Law!", 72, (255, 255, 255),
+             (WIDTH / 2, 150))
 
         # Проверки событий
         for event in pygame.event.get():
@@ -171,18 +174,21 @@ def new_game():
                 if event.key == pygame.K_ESCAPE:
                     running = False
 
-            # Возврат в меню
-            if event.type == pygame.USEREVENT and event.button == back_welcome:
+            if event.type == pygame.USEREVENT and event.button == back_button:
+                fade()
+                running = False
+
+            if event.type == pygame.USEREVENT and event.button == welcome_button:
                 print("Кнопка 'Добро пожаловать' была нажата!")
                 game = Game((1200, 800), 60)
                 steps = game.start()
                 if steps is not None:
                     record_menu(steps)
 
-            for btn in [back_welcome]:
+            for btn in [welcome_button, back_button]:
                 btn.handle_event(event)
 
-        for btn in [back_welcome]:
+        for btn in [welcome_button, back_button]:
             btn.check_hover(pygame.mouse.get_pos())
             btn.draw(screen)
 
@@ -208,12 +214,10 @@ def rules_menu():
             "Им помжно управлять при помощи стрелочек\n"
             "Рыцарь может передвигать коробку с оружием\n"
             "Также вы можете перезапустить уровень при помощи клавиши 'R' \n"
-            "или вернуться в меню при помощи клавиши 'N'\n"
-            "Ваша цель уничтожить всех пришельцевЮ, они умирают только \n"
+            "Ваша цель уничтожить всех пришельцев, они умирают только \n"
             "когда вы придеватите их коробкой об кирпичную стену\n"
-            "Важно это сделать за минимальное количество ходов\n"
-
-            , 36, (255, 255, 255), (WIDTH / 2, 100))
+            "Важно это сделать за минимальное количество ходов\n",
+            36, (255, 255, 255), (WIDTH / 2, 100))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
