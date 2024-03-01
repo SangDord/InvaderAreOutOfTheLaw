@@ -11,7 +11,7 @@ WIDTH, HEIGHT = 900, 600
 MAX_FPS = 60
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Menu test")
+pygame.display.set_caption("Menu")
 
 clock = pygame.time.Clock()
 
@@ -20,6 +20,7 @@ cursor = pygame.image.load("assets/sto.png")
 pygame.mouse.set_visible(False)  # Скрываем стандартный курсор
 
 
+# Создаем главное меню(Основное окно)
 def main_menu():
     # Создание кнопок
     start_button = Button(WIDTH / 2 - (252 / 2), 150, 252, 74, "Новая игра",
@@ -78,6 +79,7 @@ def main_menu():
         pygame.display.flip()
 
 
+# Функция для вывода текста в окно
 def text(text_main, size, color, pos):
     font = pygame.font.Font(None, size)
     x, y = pos
@@ -95,7 +97,9 @@ def new_name():
     pass
 
 
+# Создание окна информации
 def info_menu():
+    pygame.display.set_caption("Information")
     back_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Назад", "image_button.jpg",
                          "image_button_hover.jpg", 'song.mp3')
 
@@ -142,19 +146,18 @@ def info_menu():
 
 
 def new_game():
+    pygame.display.set_caption("Game")
     # Создание кнопок
-    back_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Продолжить",
-                         "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
+    back_welcome = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Продолжить",
+                          "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
 
     running = True
     while running:
         screen.fill((0, 0, 0))
 
-        font = pygame.font.Font(None, 72)
-        text_surface = font.render("Добро пожаловать в игру!", True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(WIDTH / 2, HEIGHT / 2))
-        screen.blit(text_surface, text_rect)
+        text("Добро пожаловать в игру!", 72, (255, 255, 255), (WIDTH / 2, 100))
 
+        # Проверки событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -166,15 +169,15 @@ def new_game():
                     running = False
 
             # Возврат в меню
-            if event.type == pygame.USEREVENT and event.button == back_button:
-                print(8)
+            if event.type == pygame.USEREVENT and event.button == back_welcome:
+                print("Кнопка 'Добро пожаловать' была нажата!")
                 game = Game((1200, 800), 60)
                 game.start()
 
-            for btn in [back_button]:
+            for btn in [back_welcome]:
                 btn.handle_event(event)
 
-        for btn in [back_button]:
+        for btn in [back_welcome]:
             btn.check_hover(pygame.mouse.get_pos())
             btn.draw(screen)
 
@@ -184,7 +187,9 @@ def new_game():
         pygame.display.flip()
 
 
+# Содание Правил
 def rules_menu():
+    pygame.display.set_caption("Rules")
     back_button = Button(WIDTH / 2 - (252 / 2), 450, 252, 74, "Назад", "image_button.jpg",
                          "image_button_hover.jpg", 'song.mp3')
 
