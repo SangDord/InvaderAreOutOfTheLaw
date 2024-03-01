@@ -18,7 +18,8 @@ class Game:
         key = None
         levels = load_levels()
         sprites.load_sprites()
-        menu = GameMenu(levels[0], screen)
+        cur_lvl = 0
+        menu = GameMenu(levels[cur_lvl], screen)
         running = True
         while running:
             screen.fill(pygame.Color('black'))
@@ -28,6 +29,15 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     key = event.key
             menu.update(int(et), key=key)
+            if not sprites.enemy_grp.sprites():
+                cur_lvl += 1
+                if cur_lvl > len(levels) + 1:
+                    pygame.quit()
+                menu.level_state = levels[cur_lvl]
+                menu.render()
+            if not sprites.player_grp.sprites():
+                menu.level_state = levels[cur_lvl]
+                menu.render()
             key = None
             pygame.display.flip()
             et += 3 * self.clock.tick(self.fps) / 1000

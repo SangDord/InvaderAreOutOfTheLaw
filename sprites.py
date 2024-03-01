@@ -100,7 +100,7 @@ class User(Sprite):
                 if not box.pushable(key):
                     self.rect = self.rect.move(0, self.cell_size)
         if pygame.sprite.spritecollideany(self, enemy_grp):
-            sys.exit()
+            self.remove(player_grp)
         self.image = get_sprite(self.obj_id, self.direction, et)
 
 
@@ -112,7 +112,7 @@ class Permanent(Sprite):
     def update(self, et, step):
         self.image = get_sprite(self.obj_id, self.direction, et)
         if pygame.sprite.spritecollideany(self, walls_grp):
-            self.remove()
+            self.remove(enemy_grp)
 
     def push(self, key):
         if key == pygame.K_RIGHT:
@@ -147,8 +147,8 @@ class Vertical(Sprite):
                     self.direction = (0, 1)
                     if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
                         self.rect = self.rect.move(0, -self.cell_size)
-            if pygame.sprite.spritecollideany(self, walls_grp):
-                self.remove()
+        if pygame.sprite.spritecollideany(self, walls_grp):
+            self.remove(enemy_grp)
 
     def push(self, key):
         if key == pygame.K_RIGHT:
@@ -183,8 +183,8 @@ class Horizontal(Sprite):
                     self.direction = (1, 0)
                     if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
                         self.rect = self.rect.move(-self.cell_size, 0)
-            if pygame.sprite.spritecollideany(self, walls_grp):
-                self.remove()
+        if pygame.sprite.spritecollideany(self, walls_grp):
+            self.remove(enemy_grp)
 
     def push(self, key):
         if key == pygame.K_RIGHT:
@@ -209,32 +209,20 @@ class Box(Sprite):
     def pushable(self, key):
         box_grp_without_that_box = box_grp.copy()
         box_grp_without_that_box.remove_internal(self)
-        if key == pygame.K_RIGHT:
-            self.rect = self.rect.move(self.cell_size, 0)
-            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
-                                                                                                 box_grp_without_that_box):
-                self.rect = self.rect.move(-self.cell_size, 0)
-                return False
-        elif key == pygame.K_LEFT:
-            self.rect = self.rect.move(-self.cell_size, 0)
-            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
-                                                                                                 box_grp_without_that_box):
-                self.rect = self.rect.move(self.cell_size, 0)
-                return False
-        elif key == pygame.K_DOWN:
-            self.rect = self.rect.move(0, self.cell_size)
-            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
-                                                                                                 box_grp_without_that_box):
-                self.rect = self.rect.move(0, -self.cell_size)
-                return False
-        elif key == pygame.K_UP:
-            self.rect = self.rect.move(0, -self.cell_size)
-            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
-                                                                                                 box_grp_without_that_box):
-                self.rect = self.rect.move(0, self.cell_size)
-                return False
+        moves = {pygame.K_RIGHT: [(self.cell_size, 0), (-self.cell_size, 0)],
+                 pygame.K_LEFT: [(-self.cell_size, 0), (self.cell_size, 0)],
+                 pygame.K_DOWN: [(0, self.cell_size), (0, -self.cell_size)],
+                 pygame.K_UP: [(0, -self.cell_size), (0, self.cell_size)]}
+        self.rect = self.rect.move(*moves[key][0])
+        if pygame.sprite.spritecollideany(self, walls_grp):
+            self.rect = self.rect.move(*moves[key][1])
+            return False
         if enemy := pygame.sprite.spritecollideany(self, enemy_grp):
             enemy.push(key)
+        if box := pygame.sprite.spritecollideany(self, box_grp_without_that_box):
+            if not box.pushable(key):
+                self.rect = self.rect.move(*moves[key][1])
+                return False
         return True
 
 
