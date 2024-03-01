@@ -1,5 +1,8 @@
+import sqlite3
+
 import pygame
 import sys
+from datetime import datetime
 from Buttons import Button
 from main import Game
 
@@ -172,7 +175,9 @@ def new_game():
             if event.type == pygame.USEREVENT and event.button == back_welcome:
                 print("Кнопка 'Добро пожаловать' была нажата!")
                 game = Game((1200, 800), 60)
-                game.start()
+                steps = game.start()
+                if steps is not None:
+                    record_menu(steps)
 
             for btn in [back_welcome]:
                 btn.handle_event(event)
@@ -235,6 +240,46 @@ def rules_menu():
         screen.blit(cursor, (x - 2, y - 2))
 
         pygame.display.flip()
+
+
+def record_menu(steps):
+    connect = sqlite3.connect('assets/records.sqlite')
+    font_data = pygame.font.Font(None, 36)
+    font_intro = pygame.font.Font(None, 72)
+    date = datetime.now().strftime("%D-%H:%M:%S")
+    query_write = f"""INSERT INTO results(date,steps) VALUES("{date}",{steps})"""
+    connect.cursor().execute(query_write)
+    connect.commit()
+    data = sorted(connect.cursor().execute("SELECT * FROM results").fetchall(), key=lambda x: x[1])[:10]
+
+    def render(screen, font_data, font_intro, data, cell_width, cell_height, shift_x, shift_y):
+        text_intro = font_intro.render('Результаты', 1, pygame.Color('white'))
+        text_rect = text_intro.get_rect()
+        text_rect.x, text_rect.y = WIDTH // 2 - 50, 25
+        screen.blit(text_intro, text_rect)
+        for i, row in enumerate(data):
+            for j, cell in enumerate(row):
+                cell_text = font_data.render(str(cell), 1, pygame.Color('red'))
+                cell_rect = cell_text.get_rect()
+                cell_rect.x = j * cell_width + 2 + shift_x
+                cell_rect.y = i * cell_height + 2 + shift_y
+                rect = pygame.Rect(j * cell_width + shift_x, i * cell_height + shift_y, cell_width, cell_height)
+                pygame.draw.rect(screen, pygame.Color('white'), rect, width=2)
+                screen.blit(cell_text, cell_rect)
+
+    running = True
+    while running:
+        screen.fill(pygame.Color('black'))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        render(screen, font_data, font_intro, data, 200, 50, WIDTH // 2 - 100, 100)
+        pygame.display.flip()
+        clock.tick(MAX_FPS)
+    connect.close()
 
 
 # затемнение

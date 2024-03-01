@@ -16,6 +16,7 @@ class Game:
         self.clock = pygame.time.Clock()
         et = 0
         key = None
+        finish = False
         levels = load_levels()
         sprites.load_sprites()
         cur_lvl = 0
@@ -31,8 +32,9 @@ class Game:
             menu.update(int(et), key=key)
             if not sprites.enemy_grp.sprites():
                 cur_lvl += 1
-                if cur_lvl > len(levels) + 1:
-                    pygame.quit()
+                if cur_lvl >= len(levels):
+                    finish = True
+                    break
                 menu.level_state = levels[cur_lvl]
                 menu.render()
             if not sprites.player_grp.sprites():
@@ -41,6 +43,8 @@ class Game:
             key = None
             pygame.display.flip()
             et += 3 * self.clock.tick(self.fps) / 1000
+        if finish:
+            return menu.steps
 
 
 class GameMenu:
@@ -48,6 +52,7 @@ class GameMenu:
     def __init__(self, level_state, screen):
         self.level_state = level_state
         self.screen = screen
+        self.steps = 0
         self.render()
 
     def render(self):
@@ -56,6 +61,8 @@ class GameMenu:
 
     def update(self, et, key=None):
         step = not (key is None)
+        if step:
+            self.steps += 1
         sprites.enemy_grp.update(et, step)
         sprites.player_grp.update(et, key)
         sprites.box_grp.update()
