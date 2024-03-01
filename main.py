@@ -1,6 +1,5 @@
 import pygame
 import sprites
-from tools import load_levels
 
 
 class Game:
@@ -17,7 +16,7 @@ class Game:
         et = 0
         key = None
         finish = False
-        levels = load_levels()
+        levels = sprites.load_levels()
         sprites.load_sprites()
         cur_lvl = 0
         menu = GameMenu(levels[cur_lvl], screen)

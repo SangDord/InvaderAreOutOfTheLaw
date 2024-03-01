@@ -19,6 +19,15 @@ def load_image(name, colorkey=None):
     return image
 
 
+def load_levels():
+    levels = []
+    for file in os.listdir('assets/level_maps'):
+        with open(f'assets/level_maps/{file}') as file_in:
+            level = [list(map(lambda x: x, line.rstrip('\n'))) for line in file_in.readlines()[:8]]
+            levels.append(level)
+    return levels
+
+
 def load_sprites():
     global SPRITES
     sp_img = load_image('sprites.png')
@@ -235,7 +244,6 @@ class Wall(Sprite):
 
 
 def generate_level(level):
-    player, x_coord, y_coord = None, None, None
     enemy_grp.empty()
     player_grp.empty()
     box_grp.empty()
@@ -247,7 +255,7 @@ def generate_level(level):
             elif level[y][x] == 'P':
                 Permanent(x, y)
             elif level[y][x] == 'U':
-                player, x_coord, y_coord = User(x, y), x, y
+                User(x, y)
             elif level[y][x] == 'H':
                 Horizontal(x, y)
             elif level[y][x] == 'V':

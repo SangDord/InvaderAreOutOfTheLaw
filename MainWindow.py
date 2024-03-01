@@ -1,5 +1,4 @@
 import sqlite3
-
 import pygame
 import sys
 from datetime import datetime
@@ -80,6 +79,7 @@ def main_menu():
         screen.blit(cursor, (x - 2, y - 2))
 
         pygame.display.flip()
+        clock.tick(MAX_FPS)
 
 
 # Функция для вывода текста в окно
@@ -146,6 +146,7 @@ def info_menu():
         screen.blit(cursor, (x - 2, y - 2))
 
         pygame.display.flip()
+        clock.tick(MAX_FPS)
 
 
 def new_game():
@@ -196,6 +197,7 @@ def new_game():
         screen.blit(cursor, (x - 2, y - 2))
 
         pygame.display.flip()
+        clock.tick(MAX_FPS)
 
 
 # Содание Правил
@@ -244,6 +246,7 @@ def rules_menu():
         screen.blit(cursor, (x - 2, y - 2))
 
         pygame.display.flip()
+        clock.tick(MAX_FPS)
 
 
 def record_menu(steps):
@@ -256,7 +259,7 @@ def record_menu(steps):
     connect.commit()
     data = sorted(connect.cursor().execute("SELECT * FROM results").fetchall(), key=lambda x: x[1])[:10]
 
-    def render(screen, font_data, font_intro, data, cell_width, cell_height, shift_x, shift_y):
+    def render(cell_width, cell_height, shift_x, shift_y):
         text_intro = font_intro.render('Результаты', 1, pygame.Color('white'))
         text_rect = text_intro.get_rect()
         text_rect.x, text_rect.y = WIDTH // 2 - 50, 25
@@ -280,7 +283,7 @@ def record_menu(steps):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-        render(screen, font_data, font_intro, data, 200, 50, WIDTH // 2 - 100, 100)
+        render(200, 50, WIDTH // 2 - 100, 100)
         pygame.display.flip()
         clock.tick(MAX_FPS)
     connect.close()
