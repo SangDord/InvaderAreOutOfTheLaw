@@ -26,10 +26,11 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
-                    pass
-            menu.update(int(et))
+                    key = event.key
+            menu.update(int(et), key=key)
+            key = None
             pygame.display.flip()
-            et += self.clock.tick(self.fps) / 1000
+            et += 3 * self.clock.tick(self.fps) / 1000
 
 
 class GameMenu:
@@ -44,8 +45,10 @@ class GameMenu:
         sprites.generate_level(self.level_state)
 
     def update(self, et, key=None):
-        sprites.enemy_grp.update(et)
+        step = not (key is None)
+        sprites.enemy_grp.update(et, step)
         sprites.player_grp.update(et, key)
+        sprites.box_grp.update()
         sprites.player_grp.draw(self.screen)
         sprites.enemy_grp.draw(self.screen)
         sprites.box_grp.draw(self.screen)

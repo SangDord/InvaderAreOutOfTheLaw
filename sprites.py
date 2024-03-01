@@ -1,5 +1,6 @@
 import pygame
 import os
+import sys
 
 SPRITES = dict()
 all_sprites = pygame.sprite.Group()
@@ -53,13 +54,13 @@ class Sprite(pygame.sprite.Sprite):
 
     def __init__(self, obj_id, x, y, direction, group):
         super().__init__(group)
-        cell_size = 100
+        self.cell_size = 100
         self.obj_id = obj_id
         self.direction = direction
         self.image = get_sprite(obj_id, direction)
         self.rect = self.image.get_rect()
-        self.rect.x = x * cell_size
-        self.rect.y = y * cell_size
+        self.rect.x = x * self.cell_size
+        self.rect.y = y * self.cell_size
 
 
 class User(Sprite):
@@ -68,10 +69,38 @@ class User(Sprite):
         super().__init__('U', x, y, (1, 0), player_grp)
 
     def update(self, et, key):
-        # if key == pygame.K_RIGHT:
-        #     self.direction = (1, 0)
-        # elif key == pygame.K_LEFT:
-        #     self.direction = (-1, 0)
+        if key == pygame.K_RIGHT:
+            self.direction = (1, 0)
+            self.rect = self.rect.move(self.cell_size, 0)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.rect = self.rect.move(-self.cell_size, 0)
+            if box := pygame.sprite.spritecollideany(self, box_grp):
+                if not box.pushable(key):
+                    self.rect = self.rect.move(-self.cell_size, 0)
+        elif key == pygame.K_LEFT:
+            self.direction = (-1, 0)
+            self.rect = self.rect.move(-self.cell_size, 0)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.rect = self.rect.move(self.cell_size, 0)
+            if box := pygame.sprite.spritecollideany(self, box_grp):
+                if not box.pushable(key):
+                    self.rect = self.rect.move(self.cell_size, 0)
+        elif key == pygame.K_DOWN:
+            self.rect = self.rect.move(0, self.cell_size)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.rect = self.rect.move(0, -self.cell_size)
+            if box := pygame.sprite.spritecollideany(self, box_grp):
+                if not box.pushable(key):
+                    self.rect = self.rect.move(0, -self.cell_size)
+        elif key == pygame.K_UP:
+            self.rect = self.rect.move(0, -self.cell_size)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.rect = self.rect.move(0, self.cell_size)
+            if box := pygame.sprite.spritecollideany(self, box_grp):
+                if not box.pushable(key):
+                    self.rect = self.rect.move(0, self.cell_size)
+        if pygame.sprite.spritecollideany(self, enemy_grp):
+            sys.exit()
         self.image = get_sprite(self.obj_id, self.direction, et)
 
 
@@ -80,8 +109,20 @@ class Permanent(Sprite):
     def __init__(self, x, y):
         super().__init__('P', x, y, (0, 0), enemy_grp)
 
-    def update(self, et):
+    def update(self, et, step):
         self.image = get_sprite(self.obj_id, self.direction, et)
+        if pygame.sprite.spritecollideany(self, walls_grp):
+            self.remove()
+
+    def push(self, key):
+        if key == pygame.K_RIGHT:
+            self.rect = self.rect.move(self.cell_size, 0)
+        elif key == pygame.K_LEFT:
+            self.rect = self.rect.move(-self.cell_size, 0)
+        elif key == pygame.K_DOWN:
+            self.rect = self.rect.move(0, self.cell_size)
+        elif key == pygame.K_UP:
+            self.rect = self.rect.move(0, -self.cell_size)
 
 
 class Vertical(Sprite):
@@ -89,8 +130,35 @@ class Vertical(Sprite):
     def __init__(self, x, y, direction=(0, 1)):
         super().__init__('V', x, y, direction, enemy_grp)
 
-    def update(self, et):
+    def update(self, et, step):
         self.image = get_sprite(self.obj_id, self.direction, et)
+        if step:
+            if self.direction[1] == 1:
+                self.rect = self.rect.move(0, self.cell_size)
+                if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self, box_grp):
+                    self.rect = self.rect.move(0, -2 * self.cell_size)
+                    self.direction = (0, -1)
+                    if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
+                        self.rect = self.rect.move(0, self.cell_size)
+            elif self.direction[1] == -1:
+                self.rect = self.rect.move(0, -self.cell_size)
+                if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self, box_grp):
+                    self.rect = self.rect.move(0, 2 * self.cell_size)
+                    self.direction = (0, 1)
+                    if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
+                        self.rect = self.rect.move(0, -self.cell_size)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.remove()
+
+    def push(self, key):
+        if key == pygame.K_RIGHT:
+            self.rect = self.rect.move(self.cell_size, 0)
+        elif key == pygame.K_LEFT:
+            self.rect = self.rect.move(-self.cell_size, 0)
+        elif key == pygame.K_DOWN:
+            self.rect = self.rect.move(0, self.cell_size)
+        elif key == pygame.K_UP:
+            self.rect = self.rect.move(0, -self.cell_size)
 
 
 class Horizontal(Sprite):
@@ -98,14 +166,76 @@ class Horizontal(Sprite):
     def __init__(self, x, y, direction=(1, 0)):
         super().__init__('H', x, y, direction, enemy_grp)
 
-    def update(self, et):
+    def update(self, et, step):
         self.image = get_sprite(self.obj_id, self.direction, et)
+        if step:
+            if self.direction[0] == 1:
+                self.rect = self.rect.move(self.cell_size, 0)
+                if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self, box_grp):
+                    self.rect = self.rect.move(-2 * self.cell_size, 0)
+                    self.direction = (-1, 0)
+                    if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
+                        self.rect = self.rect.move(self.cell_size, 0)
+            elif self.direction[0] == -1:
+                self.rect = self.rect.move(-self.cell_size, 0)
+                if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self, box_grp):
+                    self.rect = self.rect.move(2 * self.cell_size, 0)
+                    self.direction = (1, 0)
+                    if pygame.sprite.spritecollideany(self, box_grp) or pygame.sprite.spritecollideany(self, walls_grp):
+                        self.rect = self.rect.move(-self.cell_size, 0)
+            if pygame.sprite.spritecollideany(self, walls_grp):
+                self.remove()
+
+    def push(self, key):
+        if key == pygame.K_RIGHT:
+            self.rect = self.rect.move(self.cell_size, 0)
+        elif key == pygame.K_LEFT:
+            self.rect = self.rect.move(-self.cell_size, 0)
+        elif key == pygame.K_DOWN:
+            self.rect = self.rect.move(0, self.cell_size)
+        elif key == pygame.K_UP:
+            self.rect = self.rect.move(0, -self.cell_size)
 
 
 class Box(Sprite):
 
     def __init__(self, x, y):
         super().__init__('B', x, y, (0, 0), box_grp)
+
+    def update(self):
+        if enemy := pygame.sprite.spritecollideany(self, enemy_grp):
+            enemy_grp.remove_internal(enemy)
+
+    def pushable(self, key):
+        box_grp_without_that_box = box_grp.copy()
+        box_grp_without_that_box.remove_internal(self)
+        if key == pygame.K_RIGHT:
+            self.rect = self.rect.move(self.cell_size, 0)
+            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
+                                                                                                 box_grp_without_that_box):
+                self.rect = self.rect.move(-self.cell_size, 0)
+                return False
+        elif key == pygame.K_LEFT:
+            self.rect = self.rect.move(-self.cell_size, 0)
+            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
+                                                                                                 box_grp_without_that_box):
+                self.rect = self.rect.move(self.cell_size, 0)
+                return False
+        elif key == pygame.K_DOWN:
+            self.rect = self.rect.move(0, self.cell_size)
+            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
+                                                                                                 box_grp_without_that_box):
+                self.rect = self.rect.move(0, -self.cell_size)
+                return False
+        elif key == pygame.K_UP:
+            self.rect = self.rect.move(0, -self.cell_size)
+            if pygame.sprite.spritecollideany(self, walls_grp) or pygame.sprite.spritecollideany(self,
+                                                                                                 box_grp_without_that_box):
+                self.rect = self.rect.move(0, self.cell_size)
+                return False
+        if enemy := pygame.sprite.spritecollideany(self, enemy_grp):
+            enemy.push(key)
+        return True
 
 
 class Wall(Sprite):
@@ -115,7 +245,11 @@ class Wall(Sprite):
 
 
 def generate_level(level):
-    player, x, y = None, None, None
+    player, x_coord, y_coord = None, None, None
+    enemy_grp.empty()
+    player_grp.empty()
+    box_grp.empty()
+    walls_grp.empty()
     for y in range(8):
         for x in range(12):
             if level[y][x] == 'W':
@@ -123,7 +257,7 @@ def generate_level(level):
             elif level[y][x] == 'P':
                 Permanent(x, y)
             elif level[y][x] == 'U':
-                User(x, y)
+                player, x_coord, y_coord = User(x, y), x, y
             elif level[y][x] == 'H':
                 Horizontal(x, y)
             elif level[y][x] == 'V':
