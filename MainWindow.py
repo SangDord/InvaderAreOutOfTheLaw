@@ -23,13 +23,13 @@ pygame.mouse.set_visible(False)  # Скрываем стандартный ку�
 def main_menu():
     # Создание кнопок
     start_button = Button(WIDTH / 2 - (252 / 2), 150, 252, 74, "Новая игра",
-                          "image_button.jpg","image_button_hover.jpg", )
+                          "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
     info_button = Button(WIDTH / 2 - (252 / 2), 250, 252, 74, "Информация",
-                         "image_button.jpg","image_button_hover.jpg", )
+                         "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
     rules_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Правила",
-                          "image_button.jpg", "image_button_hover.jpg", )
+                          "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
     exit_button = Button(WIDTH / 2 - (252 / 2), 450, 252, 74, "Выйти", "image_button.jpg",
-                         "image_button_hover.jpg", )
+                         "image_button_hover.jpg", 'song.mp3')
 
     running = True
     while running:
@@ -97,7 +97,7 @@ def new_name():
 
 def info_menu():
     back_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Назад", "image_button.jpg",
-                         "image_button_hover.jpg", )
+                         "image_button_hover.jpg", 'song.mp3')
 
     running = True
     while running:
@@ -140,10 +140,11 @@ def info_menu():
 
         pygame.display.flip()
 
+
 def new_game():
     # Создание кнопок
     back_button = Button(WIDTH / 2 - (252 / 2), 350, 252, 74, "Продолжить",
-                         "image_button.jpg","image_button_hover.jpg")
+                         "image_button.jpg", "image_button_hover.jpg", 'song.mp3')
 
     running = True
     while running:
@@ -185,7 +186,7 @@ def new_game():
 
 def rules_menu():
     back_button = Button(WIDTH / 2 - (252 / 2), 450, 252, 74, "Назад", "image_button.jpg",
-                         "image_button_hover.jpg", )
+                         "image_button_hover.jpg", 'song.mp3')
 
     running = True
     while running:
